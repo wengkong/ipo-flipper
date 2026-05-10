@@ -17,7 +17,7 @@ with st.sidebar:
     )
     total_shares = st.number_input(
         "Total Shares", min_value=1, value=None, step=100,
-        placeholder="e.g. 4000",
+        placeholder="e.g. 10000",
     )
     if ipo_price is not None and total_shares is not None:
         total_cost = ipo_price * total_shares
@@ -30,7 +30,6 @@ if ipo_price is None or total_shares is None:
     st.stop()
 
 tabs = st.tabs([
-    "All-In at Peak",
     "Asymmetric Ladder",
     "Inverse Pyramid",
     "Split Equally",
@@ -60,17 +59,8 @@ def render_results(batches, summary):
     st.plotly_chart(fig, use_container_width=True)
 
 
-# ── Tab: All-In at Peak ──────────────────────────────────────────────────────
-with tabs[0]:
-    st.subheader("All-In at Peak")
-    st.caption("Sell every share in a single batch at one peak gain target. Highest upside, highest risk.")
-    peak_gain_aip = st.number_input("Peak Gain %", 1.0, 500.0, 50.0, 1.0, key="aip_peak")
-
-    batches, summary = strat.all_in_at_peak(ipo_price, int(total_shares), peak_gain_aip)
-    render_results(batches, summary)
-
 # ── Tab: Asymmetric Ladder ───────────────────────────────────────────────────
-with tabs[1]:
+with tabs[0]:
     st.subheader("Asymmetric Ladder")
     st.caption("Customise the share count AND gain % for each batch independently.")
     n_al = st.slider("Number of batches", 2, 8, 4, key="al_n")
@@ -95,7 +85,7 @@ with tabs[1]:
     render_results(batches, summary)
 
 # ── Tab: Inverse Pyramid ─────────────────────────────────────────────────────
-with tabs[2]:
+with tabs[1]:
     st.subheader("Inverse Pyramid")
     st.caption("More shares at lower gain targets, tapering off at higher targets. Maximises early exits.")
     col1, col2, col3 = st.columns(3)
@@ -107,7 +97,7 @@ with tabs[2]:
     render_results(batches, summary)
 
 # ── Tab: Split Equally ───────────────────────────────────────────────────────
-with tabs[3]:
+with tabs[2]:
     st.subheader("Split Equally")
     st.caption("Shares divided equally across all batches. You set a gain % target for each batch.")
     n_eq = st.slider("Number of batches", 2, 8, 2, key="eq_n")
@@ -121,7 +111,7 @@ with tabs[3]:
     render_results(batches, summary)
 
 # ── Tab: Trailing Stop ───────────────────────────────────────────────────────
-with tabs[4]:
+with tabs[3]:
     st.subheader("Trailing Stop (Simulation)")
     st.caption(
         "Simulates a trailing stop-loss. Shares all sell at the same stop-trigger price "
@@ -158,11 +148,6 @@ st.subheader("Strategy Comparison")
 st.caption("All strategies evaluated with their current settings above.")
 
 comparison_rows = []
-
-_, s = strat.all_in_at_peak(ipo_price, int(total_shares), peak_gain_aip)
-comparison_rows.append({"Strategy": "All-In at Peak", "Batches": 1,
-                         "Total Gain": s["total_gain"], "ROI %": s["roi_pct"],
-                         "Total Proceeds": s["total_proceeds"]})
 
 _, s = strat.asymmetric_ladder(ipo_price, int(total_shares), weights_al, gains_al)
 comparison_rows.append({"Strategy": "Asymmetric Ladder", "Batches": n_al,

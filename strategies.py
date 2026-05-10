@@ -36,11 +36,6 @@ def _summary(batches: list[dict], ipo_price: float, total_shares: int) -> dict:
     }
 
 
-def all_in_at_peak(ipo_price: float, total_shares: int, peak_gain_pct: float):
-    batches = [_batch_row(1, total_shares, peak_gain_pct, ipo_price)]
-    return batches, _summary(batches, ipo_price, total_shares)
-
-
 def split_equally(ipo_price: float, total_shares: int, gain_targets: list[float]):
     n = len(gain_targets)
     shares_each = total_shares / n

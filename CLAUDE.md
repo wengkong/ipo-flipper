@@ -30,7 +30,6 @@ Tabs are listed alphabetically.
 
 | Strategy | Key logic |
 |---|---|
-| All-In at Peak | Single batch holding every share, sells at one peak gain target |
 | Asymmetric Ladder | User-defined share weights per batch, user-defined gain % per batch |
 | Inverse Pyramid | Descending share weights `(N-i)`, evenly spaced gain targets |
 | Split Equally | N equal-share batches, user-defined gain % per batch |
