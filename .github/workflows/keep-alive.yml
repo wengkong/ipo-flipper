@@ -12,8 +12,10 @@ jobs:
       - name: Ping Streamlit app
         run: |
           curl --fail --silent --show-error \
+               --location --max-redirs 3 \
+               --cookie-jar /tmp/cookies.txt --cookie /tmp/cookies.txt \
                --max-time 60 \
                --retry 3 --retry-delay 10 \
                -o /dev/null \
-               -w "HTTP %{http_code} in %{time_total}s\n" \
+               -w "Final HTTP %{http_code} in %{time_total}s (redirects: %{num_redirects})\n" \
                https://ipo-flipper.streamlit.app
