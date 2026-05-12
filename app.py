@@ -65,13 +65,19 @@ with tabs[0]:
     st.caption("Customise the share count AND gain % for each batch independently.")
     n_al = st.slider("Number of batches", 2, 8, 4, key="al_n")
 
-    weight_defaults = [500, 1000, 2000, 500, 500, 500, 500, 500]
+    # 1:2:4:1:1:1:1:1 pyramid ratio, scaled so defaults sum exactly to Total Shares
+    base_ratios = [1, 2, 4, 1, 1, 1, 1, 1][:n_al]
+    ratio_sum = sum(base_ratios)
+    weight_defaults = [r * int(total_shares) // ratio_sum for r in base_ratios]
+    weight_defaults[-1] += int(total_shares) - sum(weight_defaults)
+
     gain_defaults = [20, 30, 40, 55, 65, 75, 85, 95]
 
     weights_al, gains_al = [], []
     cols = st.columns(n_al)
     for i, col in enumerate(cols):
-        w = col.number_input(f"Batch {i+1} Shares", 1, int(total_shares), weight_defaults[i], 100, key=f"al_w{i}")
+        w = col.number_input(f"Batch {i+1} Shares", 1, int(total_shares), weight_defaults[i], 100,
+                             key=f"al_w{i}_{int(total_shares)}_{n_al}")
         g = col.number_input(f"Batch {i+1} Gain %", 1.0, 500.0, float(gain_defaults[i]), 1.0, key=f"al_g{i}")
         weights_al.append(w)
         gains_al.append(g)
@@ -123,13 +129,17 @@ with tabs[3]:
     trail_pct = col3.number_input("Trail %", 1.0, 99.0, 15.0, 1.0, key="ts_trail")
 
     st.write("**Share allocation per batch:**")
-    weight_defaults_ts = [2000, 2000, 1000, 1000, 500, 500, 500, 500]
+    # 4:4:2:2:1:1:1:1 ratio, scaled so defaults sum exactly to Total Shares
+    base_ratios_ts = [4, 4, 2, 2, 1, 1, 1, 1][:n_ts]
+    ratio_sum_ts = sum(base_ratios_ts)
+    weight_defaults_ts = [r * int(total_shares) // ratio_sum_ts for r in base_ratios_ts]
+    weight_defaults_ts[-1] += int(total_shares) - sum(weight_defaults_ts)
+
     weights_ts = []
     cols = st.columns(n_ts)
     for i, col in enumerate(cols):
-        w = col.number_input(f"Batch {i+1} Shares", 1, int(total_shares),
-                             weight_defaults_ts[i] if i < 8 else int(total_shares // n_ts),
-                             100, key=f"ts_w{i}")
+        w = col.number_input(f"Batch {i+1} Shares", 1, int(total_shares), weight_defaults_ts[i], 100,
+                             key=f"ts_w{i}_{int(total_shares)}_{n_ts}")
         weights_ts.append(w)
 
     peak_price = ipo_price * (1 + peak_gain / 100)
